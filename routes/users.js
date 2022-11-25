@@ -16,17 +16,22 @@ router.get("/", function (req, res, next) {
 	res.send("respond with a resource");
 });
 
-// router.post("/register", async (req, res) => {
-// 	const { email, password } = req.body;
-// 	const hashedPassword = await hash(password, 5);
-// 	const user = {
-// 		_id: uuid(),
-// 		email,
-// 		password: hashedPassword,
-// 	};
-// 	await db().collection("users").insertOne(user);
-// 	res.json(user);
-// });
+//get user by email
+router.get("/email/:email", async (req, res) => {
+	const { email } = req.params;
+	const user = await db().collection("users").findOne({
+		email: email,
+	});
+	try {
+		if (user) {
+			res.json(user);
+		} else {
+			res.status(404).json({ message: "User not found" });
+		}
+	} catch (error) {
+		res.status(500).json({ message: error.message });
+	}
+});
 
 router.post("/register", async (req, res, next) => {
 	const { email, password } = req.body;
@@ -81,9 +86,7 @@ router.post("/login", async (req, res) => {
 	res.json({
 		success: true,
 		token,
-		email: user.email,
+		userdata,
 	});
 });
-
-
 module.exports = router;
