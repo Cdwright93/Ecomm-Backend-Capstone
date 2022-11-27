@@ -33,6 +33,25 @@ router.get("/email/:email", async (req, res) => {
 	}
 });
 
+//get user by id
+router.get("/id/:id", async (req, res) => {
+	const { id } = req.params;
+	const user = await db().collection("users").findOne({
+		_id: id,
+	});
+	try {
+		if (user) {
+			res.json(user);
+		} else {
+			res.status(404).json({ message: "User not found" });
+		}
+	} catch (error) {
+		res.status(500).json({ message: error.message });
+	}
+});
+
+
+
 router.post("/register", async (req, res, next) => {
 	const { email, password } = req.body;
 	const hashedPassword = await hash(password, 5);
