@@ -53,12 +53,14 @@ router.get("/id/:id", async (req, res) => {
 
 
 router.post("/register", async (req, res, next) => {
-	const { email, password } = req.body;
+	const { email, password, firstname, lastname } = req.body;
 	const hashedPassword = await hash(password, 5);
 	const user = {
 		_id: uuid(),
 		email,
 		password: hashedPassword,
+		firstname,
+		lastname,
 		subscribed: {
 			status: false,
 			date: null,
@@ -91,11 +93,14 @@ router.post("/login", async (req, res) => {
 	const userdata = {
 		_id: user._id,
 		email: user.email,
+		firstname: user.firstname,
+		lastname: user.lastname,
+		subscribed: user.subscribed,
 	};
 	const token = sign(
 		{
-			_id: user._id,
 			Date: new Date(),
+			userdata,
 		},
 		process.env.JWT_SECRET_KEY,
 		{
@@ -105,7 +110,6 @@ router.post("/login", async (req, res) => {
 	res.json({
 		success: true,
 		token,
-		userdata,
 	});
 });
 module.exports = router;
