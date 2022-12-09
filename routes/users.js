@@ -63,9 +63,9 @@ router.post("/register", async (req, res, next) => {
 		lastname,
 		subscribed: {
 			status: false,
-			date: null,
-			tier: null,
-			address: null,
+			date: "",
+			tier: "",
+			address: ""
 		},
 	};
 	await db().collection("users").insertOne(user);
@@ -112,4 +112,34 @@ router.post("/login", async (req, res) => {
 		token,
 	});
 });
+
+//update user
+router.put("/update/:id", async (req, res) => {
+	const { id } = req.params;
+	const { email, password, firstname, lastname, tier, address} = req.body;
+	const hashedPassword = await hash(password, 5);
+	const user = {
+		email,
+		password: hashedPassword,
+		firstname,
+		lastname,
+		subscribed: {
+			status: true || false,
+			date: new Date(),
+			tier,
+			address,
+		},
+	};
+	await db().collection("users").updateOne(
+		{
+			_id: id,
+		},
+		{
+			$set: user,
+		}
+	);
+	res.json(user);
+});
+
+
 module.exports = router;
