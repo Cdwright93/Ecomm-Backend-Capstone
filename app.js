@@ -7,7 +7,7 @@ const cors = require("cors");
 require("dotenv").config();
 var { mongoConnect } = require("./mongo.js");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-
+const { db } = require("./mongo.js");
 mongoConnect();
 
 var indexRouter = require("./routes/index");
@@ -41,7 +41,9 @@ app.post("/create-checkout-session", async (req, res) => {
 					price_data: {
 						currency: "usd",
 						product_data: {
+							img: req.body.image,
 							name: req.body.name,
+							description: req.body.description,
 						},
 						unit_amount: req.body.price * 100,
 					},
@@ -51,8 +53,9 @@ app.post("/create-checkout-session", async (req, res) => {
 			mode: "payment",
 			success_url: "http://localhost:3000/",
 			cancel_url: "http://localhost:4000/cancel",
-		})
+		});
 		res.json({ url: session.url });
+		res.status(200).send(session);
 	} catch (error) {
 		console.log(error);
 	}
